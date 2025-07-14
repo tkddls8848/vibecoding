@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Claude RAG 쿼리 인터페이스</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        input[type="number"] {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .result {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+        .documents {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        .document {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .document-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .params-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .param {
+            flex: 1;
+            min-width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Claude RAG 쿼리 인터페이스</h1>
+        <p>아래 입력 필드에 질문을 입력하고 제출 버튼을 클릭하세요.</p>
+        
+        <form method="get" action="/web-query">
+            <div>
+                <label for="q">질문:</label>
+                <textarea name="q" id="q" required>{{ query }}</textarea>
+            </div>
+            
+            <div class="params-group">
+                <div class="param">
+                    <label for="top_k">검색 문서 수:</label>
+                    <input type="number" name="top_k" id="top_k" value="{{ top_k }}" min="1" max="20">
+                </div>
+                <div class="param">
+                    <label for="temperature">응답 창의성:</label>
+                    <input type="number" name="temperature" id="temperature" value="{{ temperature }}" min="0" max="1" step="0.1">
+                </div>
+                <div class="param">
+                    <label for="max_tokens">최대 토큰 수:</label>
+                    <input type="number" name="max_tokens" id="max_tokens" value="{{ max_tokens }}" min="100" max="4000">
+                </div>
+            </div>
+            
+            <button type="submit">질문 제출</button>
+        </form>
+        
+        {% if result %}
+        <h2>응답:</h2>
+        <div class="result">{{ result }}</div>
+        
+        {% if used_documents %}
+        <div class="documents">
+            <h3>사용된 문서:</h3>
+            {% for doc in used_documents %}
+            <div class="document">
+                <div class="document-title">{{ doc.file_name }} (유사도: {{ "%.4f"|format(doc.score) }})</div>
+                <div class="document-preview">{{ doc.preview }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>
