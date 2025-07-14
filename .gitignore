@@ -11,6 +11,7 @@ OSD
 **/api_data
 **/api_docs
 **/output
+**/results
 **/embeddings
 uddi*
 .next
